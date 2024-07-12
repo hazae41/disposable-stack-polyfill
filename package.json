@@ -35,8 +35,8 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs"
+      "import": "./dist/esm/src/index.mjs",
+      "require": "./dist/cjs/src/index.cjs"
     }
   },
   "keywords": [
