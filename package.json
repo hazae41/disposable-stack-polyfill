@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/disposable-stack-polyfill",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "Polyfill for DisposableStack and AsyncDisposableStack",
   "homepage": "https://github.com/hazae41/disposable-stack-polyfill",
   "repository": "github:hazae41/disposable-stack-polyfill",
