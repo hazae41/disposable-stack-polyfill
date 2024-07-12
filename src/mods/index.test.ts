@@ -1,1 +1,1 @@
-export * from "./symbol-dispose-polyfill/polyfill.test.js";
+export * from "./disposable-stack-polyfill/polyfill.test.js";
