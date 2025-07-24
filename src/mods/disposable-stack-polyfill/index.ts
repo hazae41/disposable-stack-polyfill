@@ -1,8 +1,8 @@
-import { Awaitable } from "libs/awaitable/index.ts"
+import { Awaitable } from "libs/awaitable/index.js"
 
 if (typeof DisposableStack !== "function") {
 
-  class Dispose {
+  class AsyncDeferred {
 
     constructor(
       readonly dispose: () => void
@@ -51,7 +51,7 @@ if (typeof DisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.unshift(disposable)
+      this.#stack.push(disposable)
 
       return disposable
     }
@@ -60,7 +60,7 @@ if (typeof DisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.unshift(new Dispose(() => dispose(value)))
+      this.#stack.push(new AsyncDeferred(() => dispose(value)))
 
       return value
     }
@@ -69,7 +69,7 @@ if (typeof DisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.unshift(new Dispose(dispose))
+      this.#stack.push(new AsyncDeferred(dispose))
 
       return
     }
@@ -97,7 +97,7 @@ if (typeof DisposableStack !== "function") {
 
 if (typeof AsyncDisposableStack !== "function") {
 
-  class AsyncDispose {
+  class AsyncDeferred {
 
     constructor(
       readonly dispose: () => Awaitable<void>
@@ -146,7 +146,7 @@ if (typeof AsyncDisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.unshift(disposable)
+      this.#stack.push(disposable)
 
       return disposable
     }
@@ -155,7 +155,7 @@ if (typeof AsyncDisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.unshift(new AsyncDispose(() => dispose(value)))
+      this.#stack.push(new AsyncDeferred(() => dispose(value)))
 
       return value
     }
@@ -164,7 +164,7 @@ if (typeof AsyncDisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.unshift(new AsyncDispose(dispose))
+      this.#stack.push(new AsyncDeferred(dispose))
 
       return
     }

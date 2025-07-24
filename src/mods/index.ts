@@ -1,2 +1,2 @@
-export * from "./disposable-stack-polyfill/polyfill.js";
+export * from "./disposable-stack-polyfill/index.js";
 

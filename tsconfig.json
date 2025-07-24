@@ -7,7 +7,6 @@
     "strict": true,
     "downlevelIteration": true,
     "noEmit": true,
-    "allowImportingTsExtensions": true,
     "lib": [
       "DOM",
       "ESNext"
