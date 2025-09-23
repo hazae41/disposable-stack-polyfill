@@ -75,7 +75,7 @@ await test('multiple dispose errors', async () => {
     }
   }
 
-  let err
+  let err: any
   try {
      using stack = new DisposableStack()
      stack.use(obj1)
@@ -84,10 +84,13 @@ await test('multiple dispose errors', async () => {
      err = e
   }
 
-  assert(err instanceof AggregateError, "should be an AggregateError")
-  assert((err as AggregateError).errors.length === 2, "should contain two errors")
+  assert(err instanceof Error, 'error should be an instance of Error')
+  assert(err.name === 'SuppressedError', 'error should be a SuppressedError')
+  assert('error' in err && err.error instanceof Error, 'main error should be an instance of Error')
+  assert(err.error.message === 'dispose error 1', 'main error should be "dispose error 1"')
+  assert('suppressed' in err && err.suppressed instanceof Error, 'suppressed error should be an instance of Error')
+  assert(err.suppressed.message === 'dispose error 2', 'suppressed error should be "dispose error 2"')
 
-
-  assert(obj1.disposed, "obj1 should be disposed")
-  assert(obj2.disposed, "obj2 should be disposed")
+  assert(obj1.disposed, 'obj1 should be disposed')
+  assert(obj2.disposed, 'obj2 should be disposed')
 })
