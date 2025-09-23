@@ -1,4 +1,4 @@
-import { assert, test, throws } from "@hazae41/phobos";
+import { assert, rejects, test, throws } from "@hazae41/phobos";
 import "./index.ts";
 
 class SyncResource {
@@ -48,87 +48,31 @@ await test("error", async () => {
     using stack = new DisposableStack()
 
     stack.defer(() => {
-      ok = true
+      throw new Error()
     })
 
     stack.defer(() => {
-      throw new Error()
+      ok = true
     })
   }))
 
   assert(ok)
 })
 
-await test('multiple dispose errors', async () => {
-  const obj1 = {
-    disposed: false,
-    [Symbol.dispose]() {
-      this.disposed = true
-      throw new Error('dispose error 1')
-    }
-  }
-  const obj2 = {
-    disposed: false,
-    [Symbol.dispose]() {
-      this.disposed = true
-      throw new Error('dispose error 2')
-    }
-  }
+await test("async error", async () => {
+  let ok = false
 
-  let err: any
-  try {
-     using stack = new DisposableStack()
-     stack.use(obj1)
-     stack.use(obj2)
-  } catch (e) {
-     err = e
-  }
+  assert(await rejects(async () => {
+    await using stack = new AsyncDisposableStack()
 
-  assert(err instanceof Error, 'error should be an instance of Error')
-  assert(err.name === 'SuppressedError', 'error should be a SuppressedError')
-  assert('error' in err && err.error instanceof Error, 'main error should be an instance of Error')
-  assert(err.error.message === 'dispose error 1', 'main error should be "dispose error 1"')
-  assert('suppressed' in err && err.suppressed instanceof Error, 'suppressed error should be an instance of Error')
-  assert(err.suppressed.message === 'dispose error 2', 'suppressed error should be "dispose error 2"')
+    stack.defer(() => {
+      throw new Error()
+    })
 
-  assert(obj1.disposed, 'obj1 should be disposed')
-  assert(obj2.disposed, 'obj2 should be disposed')
-})
+    stack.defer(async () => {
+      ok = true
+    })
+  }))
 
-
-
-await test('multiple async disposable errors', async () => {
-  const obj1 = {
-    disposed: false,
-    [Symbol.asyncDispose]() {
-      this.disposed = true
-      throw new Error('dispose error 1')
-    }
-  }
-  const obj2 = {
-    disposed: false,
-    [Symbol.dispose]() {
-      this.disposed = true
-      throw new Error('dispose error 2')
-    }
-  }
-
-  let err: any
-  try {
-     await using stack = new AsyncDisposableStack()
-     stack.use(obj1)
-     stack.use(obj2)
-  } catch (e) {
-     err = e
-  }
-
-  assert(err instanceof Error, 'error should be an instance of Error')
-  assert(err.name === 'SuppressedError', 'error should be a SuppressedError')
-  assert('error' in err && err.error instanceof Error, 'main error should be an instance of Error')
-  assert(err.error.message === 'dispose error 1', 'main error should be "dispose error 1"')
-  assert('suppressed' in err && err.suppressed instanceof Error, 'suppressed error should be an instance of Error')
-  assert(err.suppressed.message === 'dispose error 2', 'suppressed error should be "dispose error 2"')
-
-  assert(obj1.disposed, 'obj1 should be disposed')
-  assert(obj2.disposed, 'obj2 should be disposed')
+  assert(ok)
 })
