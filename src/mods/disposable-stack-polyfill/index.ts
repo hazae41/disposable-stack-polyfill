@@ -1,7 +1,7 @@
 import { __addDisposableResource, __disposeResources } from 'tslib';
 import { Awaitable } from "libs/awaitable/index.js"
 
-type DisposeResourcesEnv = Parameters<typeof __disposeResources>[0]
+type Env = Parameters<typeof __disposeResources>[0]
 
 if (typeof DisposableStack !== "function") {
 
@@ -43,17 +43,22 @@ if (typeof DisposableStack !== "function") {
 
       this.#disposed = true
 
-      const env: DisposeResourcesEnv = {
+      const env: Env = {
         stack: [],
         error: undefined,
         hasError: false
       }
 
-      for (const disposable of this.#stack) {
-        __addDisposableResource(env, disposable, false)
+      try {
+        for (const disposable of this.#stack) {
+          __addDisposableResource(env, disposable, false)
+        }
+      } catch (err) {
+        env.error = err
+        env.hasError = true
+      } finally {
+        __disposeResources(env)
       }
-
-      __disposeResources(env)
 
       return
     }
@@ -146,17 +151,22 @@ if (typeof AsyncDisposableStack !== "function") {
 
       this.#disposed = true
 
-      const env: DisposeResourcesEnv = {
+      const env: Env = {
         stack: [],
         error: undefined,
         hasError: false
       }
 
-      for (const disposable of this.#stack) {
-        __addDisposableResource(env, disposable, true)
+      try {
+        for (const disposable of this.#stack) {
+          __addDisposableResource(env, disposable, true)
+        }
+      } catch (err) {
+        env.error = err
+        env.hasError = true
+      } finally {
+        await __disposeResources(env)
       }
-
-      await __disposeResources(env)
 
       return
     }
