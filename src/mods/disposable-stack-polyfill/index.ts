@@ -1,16 +1,21 @@
-import { __addDisposableResource, __disposeResources } from 'tslib';
-import { Awaitable } from "libs/awaitable/index.js"
+import { Awaitable } from "libs/awaitable/index.js";
+import { Nullable } from "libs/nullable/index.js";
+import { __addDisposableResource, __disposeResources } from "tslib";
 
-type Env = Parameters<typeof __disposeResources>[0]
+interface State {
+  stack: any[];
+  error: unknown;
+  hasError: boolean;
+}
 
 if (typeof DisposableStack !== "function") {
 
   class DisposableStack {
 
-    #env: null | Env = { stack: [], error: undefined, hasError: false }
+    #state: Nullable<State> = { stack: [], error: undefined, hasError: false }
 
     get disposed() {
-      return this.#env === null
+      return this.#state == null
     }
 
     [Symbol.dispose]() {
@@ -22,11 +27,12 @@ if (typeof DisposableStack !== "function") {
     }
 
     dispose(): void {
-      if (!this.#env)
+      if (this.#state == null)
         return
 
-      const env = this.#env
-      this.#env = null
+      const env = this.#state
+
+      this.#state = null
 
       __disposeResources(env)
 
@@ -34,38 +40,39 @@ if (typeof DisposableStack !== "function") {
     }
 
     use<T extends Disposable>(disposable: T): T {
-      if (!this.#env)
+      if (this.#state == null)
         throw new ReferenceError()
 
-      __addDisposableResource(this.#env, disposable, false)
+      __addDisposableResource(this.#state, disposable, false)
 
       return disposable
     }
 
     adopt<T>(value: T, dispose: (value: T) => void): T {
-      this.use({
-        [Symbol.dispose]: dispose.bind(undefined, value)
-      })
+      const disposable = { [Symbol.dispose]: () => dispose(value) }
+
+      this.use(disposable)
 
       return value
     }
 
     defer(dispose: () => void): void {
-      this.use({
-        [Symbol.dispose]: dispose.bind(undefined)
-      })
+      const disposable = { [Symbol.dispose]: () => dispose() }
+
+      this.use(disposable)
 
       return
     }
 
     move(): DisposableStack {
-      if (!this.#env)
+      if (this.#state == null)
         throw new ReferenceError()
 
       const next = new DisposableStack()
 
-      next.#env = this.#env
-      this.#env = null
+      next.#state = this.#state
+
+      this.#state = null
 
       return next
     }
@@ -79,10 +86,10 @@ if (typeof AsyncDisposableStack !== "function") {
 
   class AsyncDisposableStack {
 
-    #env: null | Env = { stack: [], error: undefined, hasError: false }
+    #state: Nullable<State> = { stack: [], error: undefined, hasError: false }
 
     get disposed() {
-      return this.#env === null
+      return this.#state == null
     }
 
     async [Symbol.asyncDispose]() {
@@ -94,11 +101,12 @@ if (typeof AsyncDisposableStack !== "function") {
     }
 
     async disposeAsync(): Promise<void> {
-      if (!this.#env)
+      if (this.#state == null)
         return
 
-      const env = this.#env
-      this.#env = null
+      const env = this.#state
+
+      this.#state = null
 
       await __disposeResources(env)
 
@@ -106,38 +114,39 @@ if (typeof AsyncDisposableStack !== "function") {
     }
 
     use<T extends AsyncDisposable>(disposable: T): T {
-      if (!this.#env)
+      if (this.#state == null)
         throw new ReferenceError()
 
-      __addDisposableResource(this.#env, disposable, true)
+      __addDisposableResource(this.#state, disposable, true)
 
       return disposable
     }
 
     adopt<T>(value: T, dispose: (value: T) => Awaitable<void>): T {
-      this.use({
-        [Symbol.asyncDispose]: async () => dispose(value)
-      })
+      const disposable = { [Symbol.asyncDispose]: async () => dispose(value) }
+
+      this.use(disposable)
 
       return value
     }
 
     defer(dispose: () => Awaitable<void>): void {
-      this.use({
-        [Symbol.asyncDispose]: async () => dispose()
-      })
+      const disposable = { [Symbol.asyncDispose]: async () => dispose() }
+
+      this.use(disposable)
 
       return
     }
 
     move(): AsyncDisposableStack {
-      if (!this.#env)
+      if (!this.#state)
         throw new ReferenceError()
 
       const next = new AsyncDisposableStack()
 
-      next.#env = this.#env
-      this.#env = null
+      next.#state = this.#state
+
+      this.#state = null
 
       return next
     }
