@@ -1,4 +1,4 @@
-import { assert, test, throws } from "@hazae41/phobos";
+import { assert, rejects, test, throws } from "@hazae41/phobos";
 import "./index.ts";
 
 class SyncResource {
@@ -48,11 +48,30 @@ await test("error", async () => {
     using stack = new DisposableStack()
 
     stack.defer(() => {
-      ok = true
+      throw new Error()
     })
 
     stack.defer(() => {
+      ok = true
+    })
+  }))
+
+  assert(ok)
+})
+
+
+await test("async error", async () => {
+  let ok = false
+
+  assert(await rejects(async () => {
+    await using stack = new AsyncDisposableStack()
+
+    stack.defer(async () => {
       throw new Error()
+    })
+
+    stack.defer(() => {
+      ok = true
     })
   }))
 

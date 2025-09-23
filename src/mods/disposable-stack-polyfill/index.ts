@@ -1,22 +1,13 @@
+import { __addDisposableResource, __disposeResources } from 'tslib';
 import { Awaitable } from "libs/awaitable/index.js"
+
+type Env = Parameters<typeof __disposeResources>[0]
 
 if (typeof DisposableStack !== "function") {
 
-  class AsyncDeferred {
-
-    constructor(
-      readonly dispose: () => void
-    ) { }
-
-    [Symbol.dispose]() {
-      this.dispose()
-    }
-
-  }
-
   class DisposableStack {
 
-    #stack = new Array<Disposable>()
+    #env: Env = { stack: [], error: undefined, hasError: false }
 
     #disposed = false
 
@@ -40,18 +31,14 @@ if (typeof DisposableStack !== "function") {
 
       this.#disposed = true
 
-      for (const disposable of this.#stack) {
-        using _ = disposable
-      }
-
-      return
+      __disposeResources(this.#env)
     }
 
     use<T extends Disposable>(disposable: T) {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.push(disposable)
+      __addDisposableResource(this.#env, disposable, false)
 
       return disposable
     }
@@ -60,7 +47,7 @@ if (typeof DisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.push(new AsyncDeferred(() => dispose(value)))
+      this.#env.stack.push({ value, dispose, async: false })
 
       return value
     }
@@ -69,7 +56,7 @@ if (typeof DisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.push(new AsyncDeferred(dispose))
+      this.#env.stack.push({ dispose, async: false })
 
       return
     }
@@ -80,11 +67,9 @@ if (typeof DisposableStack !== "function") {
 
       const next = new DisposableStack()
 
-      for (const disposable of this.#stack) {
-        next.use(disposable)
-      }
-
-      this.#stack = new Array()
+      const nextEnv = next.#env
+      next.#env = this.#env
+      this.#env = nextEnv
       this.#disposed = true
 
       return next
@@ -97,21 +82,9 @@ if (typeof DisposableStack !== "function") {
 
 if (typeof AsyncDisposableStack !== "function") {
 
-  class AsyncDeferred {
-
-    constructor(
-      readonly dispose: () => Awaitable<void>
-    ) { }
-
-    async [Symbol.asyncDispose]() {
-      await this.dispose()
-    }
-
-  }
-
   class AsyncDisposableStack {
 
-    #stack = new Array<AsyncDisposable>()
+    #env: Env = { stack: [], error: undefined, hasError: false }
 
     #disposed = false
 
@@ -135,9 +108,7 @@ if (typeof AsyncDisposableStack !== "function") {
 
       this.#disposed = true
 
-      for (const disposable of this.#stack) {
-        await using _ = disposable
-      }
+      await __disposeResources(this.#env)
 
       return
     }
@@ -146,7 +117,7 @@ if (typeof AsyncDisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.push(disposable)
+      __addDisposableResource(this.#env, disposable, true)
 
       return disposable
     }
@@ -155,7 +126,7 @@ if (typeof AsyncDisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.push(new AsyncDeferred(() => dispose(value)))
+      this.#env.stack.push({ value, dispose, async: true })
 
       return value
     }
@@ -164,7 +135,7 @@ if (typeof AsyncDisposableStack !== "function") {
       if (this.#disposed)
         throw new ReferenceError()
 
-      this.#stack.push(new AsyncDeferred(dispose))
+      this.#env.stack.push({ dispose, async: true })
 
       return
     }
@@ -175,11 +146,9 @@ if (typeof AsyncDisposableStack !== "function") {
 
       const next = new AsyncDisposableStack()
 
-      for (const disposable of this.#stack) {
-        next.use(disposable)
-      }
-
-      this.#stack = new Array()
+      const nextEnv = next.#env
+      next.#env = this.#env
+      this.#env = nextEnv
       this.#disposed = true
 
       return next
