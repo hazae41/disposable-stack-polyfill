@@ -153,7 +153,7 @@ if (typeof AsyncDisposableStack !== "function") {
       }
 
       for (const disposable of this.#stack) {
-        __addDisposableResource(env, disposable, false)
+        __addDisposableResource(env, disposable, true)
       }
 
       await __disposeResources(env)
