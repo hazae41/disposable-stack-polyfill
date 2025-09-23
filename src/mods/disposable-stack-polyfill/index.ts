@@ -80,10 +80,7 @@ if (typeof DisposableStack !== "function") {
 
       const next = new DisposableStack()
 
-      for (const disposable of this.#stack) {
-        next.use(disposable)
-      }
-
+      next.#stack = this.#stack
       this.#stack = new Array()
       this.#disposed = true
 
@@ -175,10 +172,7 @@ if (typeof AsyncDisposableStack !== "function") {
 
       const next = new AsyncDisposableStack()
 
-      for (const disposable of this.#stack) {
-        next.use(disposable)
-      }
-
+      next.#stack = this.#stack
       this.#stack = new Array()
       this.#disposed = true
 
