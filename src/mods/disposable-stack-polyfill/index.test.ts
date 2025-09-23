@@ -58,3 +58,36 @@ await test("error", async () => {
 
   assert(ok)
 })
+
+await test('multiple dispose errors', async () => {
+  const obj1 = {
+    disposed: false,
+    [Symbol.dispose]() {
+      this.disposed = true
+      throw new Error('dispose error 1')
+    }
+  }
+  const obj2 = {
+    disposed: false,
+    [Symbol.dispose]() {
+      this.disposed = true
+      throw new Error('dispose error 2')
+    }
+  }
+
+  let err
+  try {
+     using stack = new DisposableStack()
+     stack.use(obj1)
+     stack.use(obj2)
+  } catch (e) {
+     err = e
+  }
+
+  assert(err instanceof AggregateError, "should be an AggregateError")
+  assert((err as AggregateError).errors.length === 2, "should contain two errors")
+
+
+  assert(obj1.disposed, "obj1 should be disposed")
+  assert(obj2.disposed, "obj2 should be disposed")
+})
