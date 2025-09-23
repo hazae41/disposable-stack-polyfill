@@ -94,3 +94,41 @@ await test('multiple dispose errors', async () => {
   assert(obj1.disposed, 'obj1 should be disposed')
   assert(obj2.disposed, 'obj2 should be disposed')
 })
+
+
+
+await test('multiple async disposable errors', async () => {
+  const obj1 = {
+    disposed: false,
+    [Symbol.asyncDispose]() {
+      this.disposed = true
+      throw new Error('dispose error 1')
+    }
+  }
+  const obj2 = {
+    disposed: false,
+    [Symbol.dispose]() {
+      this.disposed = true
+      throw new Error('dispose error 2')
+    }
+  }
+
+  let err: any
+  try {
+     await using stack = new AsyncDisposableStack()
+     stack.use(obj1)
+     stack.use(obj2)
+  } catch (e) {
+     err = e
+  }
+
+  assert(err instanceof Error, 'error should be an instance of Error')
+  assert(err.name === 'SuppressedError', 'error should be a SuppressedError')
+  assert('error' in err && err.error instanceof Error, 'main error should be an instance of Error')
+  assert(err.error.message === 'dispose error 1', 'main error should be "dispose error 1"')
+  assert('suppressed' in err && err.suppressed instanceof Error, 'suppressed error should be an instance of Error')
+  assert(err.suppressed.message === 'dispose error 2', 'suppressed error should be "dispose error 2"')
+
+  assert(obj1.disposed, 'obj1 should be disposed')
+  assert(obj2.disposed, 'obj2 should be disposed')
+})
