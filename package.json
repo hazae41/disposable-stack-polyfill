@@ -24,10 +24,12 @@
       "import": "./out/mod.js"
     }
   },
+  "dependencies": {
+    "tslib": "^2.8.1"
+  },
   "devDependencies": {
     "@hazae41/phobos": "^2.0.4",
     "@hazae41/tscousin": "^1.0.11",
-    "tslib": "^2.8.1",
     "typescript": "^5.9.2"
   },
   "keywords": [

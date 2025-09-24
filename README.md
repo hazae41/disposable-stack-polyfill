@@ -3,10 +3,14 @@
 Polyfill for `DisposableStack` and `AsyncDisposableStack`
 
 ```bash
-npm i @hazae41/disposable-stack-polyfill
+npm install @hazae41/disposable-stack-polyfill
 ```
 
-[**Node Package 📦**](https://www.npmjs.com/package/@hazae41/disposable-stack-polyfill)
+```bash
+deno install jsr:@hazae41/disposable-stack-polyfill
+```
+
+[**📦 NPM**](https://www.npmjs.com/package/@hazae41/disposable-stack-polyfill) • [**📦 JSR**](https://jsr.io/@hazae41/disposable-stack-polyfill)
 
 ## Features
 - ESModules and CommonJS
@@ -17,16 +21,8 @@ npm i @hazae41/disposable-stack-polyfill
 
 ### How?
 
-ESModules 
-
 ```tsx
 import "@hazae41/disposable-stack-polyfill"
-```
-
-CommonJS
-
-```tsx
-require("@hazae41/disposable-stack-polyfill")
 ```
 
 ### Where? 
