@@ -1,5 +1,5 @@
 import { assert, rejects, test, throws } from "@hazae41/phobos";
-import "./index.ts";
+import "./mod.ts";
 
 class SyncResource {
 
@@ -11,7 +11,7 @@ class SyncResource {
 
 }
 
-await test("sync", async ({ message, test }) => {
+test("sync", () => {
   const obj = new SyncResource()
 
   {
@@ -25,13 +25,14 @@ class AsyncResource {
 
   disposed = false;
 
+  // deno-lint-ignore require-await
   async [Symbol.asyncDispose]() {
     this.disposed = true
   }
 
 }
 
-await test("async", async ({ message, test }) => {
+test("async", async () => {
   const obj = new AsyncResource()
 
   {
@@ -41,7 +42,7 @@ await test("async", async ({ message, test }) => {
   assert(obj.disposed)
 })
 
-await test("defer", async () => {
+test("defer", () => {
   let ok = false
 
   {
@@ -49,29 +50,29 @@ await test("defer", async () => {
 
     stack.defer(function (this: unknown) {
       ok = true
-      assert(this === undefined, 'this is undefined')
+      assert(this === undefined, "this is undefined")
     })
   }
 
-  assert(ok, 'defer was called')
+  assert(ok, "defer was called")
 })
 
-await test("async defer", async () => {
+test("async defer", async () => {
   let ok = false
 
   {
     await using stack = new AsyncDisposableStack()
 
-    stack.defer(async function (this: unknown) {
+    stack.defer(function (this: unknown) {
       ok = true
-      assert(this === undefined, 'this is undefined')
+      assert(this === undefined, "this is undefined")
     })
   }
 
-  assert(ok, 'defer was called')
+  assert(ok, "defer was called")
 })
 
-await test("error", async () => {
+test("error", () => {
   let ok = false
 
   assert(throws(() => {
@@ -89,17 +90,17 @@ await test("error", async () => {
   assert(ok)
 })
 
-await test("async error", async () => {
+test("async error", async () => {
   let ok = false
 
   assert(await rejects(async () => {
     await using stack = new AsyncDisposableStack()
 
-    stack.defer(async () => {
+    stack.defer(() => {
       throw new Error()
     })
 
-    stack.defer(async () => {
+    stack.defer(() => {
       ok = true
     })
   }))
@@ -107,7 +108,7 @@ await test("async error", async () => {
   assert(ok)
 })
 
-await test("use non disposable", async () => {
+test("use non disposable", () => {
   let ok = false
   let after = false
 
@@ -119,32 +120,32 @@ await test("use non disposable", async () => {
     })
 
     // @ts-expect-error Should cause runtime error
-    stack.use({ })
+    stack.use({})
 
     after = true
   }))
 
-  assert(ok, 'defer was called')
-  assert(after === false, 'stack.use() did not throw')
+  assert(ok, "defer was called")
+  assert(after === false, "stack.use() did not throw")
 })
 
-await test("use non async disposable", async () => {
+test("use non async disposable", async () => {
   let ok = false
   let after = false
 
   assert(await rejects(async () => {
     await using stack = new AsyncDisposableStack()
 
-    stack.defer(async () => {
+    stack.defer(() => {
       ok = true
     })
 
     // @ts-expect-error Should cause runtime error
-    stack.use({ })
+    stack.use({})
 
     after = true
   }))
 
-  assert(ok, 'defer was called')
-  assert(after === false, 'stack.use() did not throw')
+  assert(ok, "defer was called")
+  assert(after === false, "stack.use() did not throw")
 })

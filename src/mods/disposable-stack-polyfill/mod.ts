@@ -1,11 +1,16 @@
-import { Awaitable } from "libs/awaitable/index.js";
-import { Nullable } from "libs/nullable/index.js";
+import type { Awaitable } from "@/libs/awaitable/mod.ts";
+import type { Nullable } from "@/libs/nullable/mod.ts";
 import { __addDisposableResource, __disposeResources } from "tslib";
 
 interface State {
+
+  // deno-lint-ignore no-explicit-any
   stack: any[];
+
   error: unknown;
+
   hasError: boolean;
+
 }
 
 if (typeof DisposableStack !== "function") {
@@ -123,6 +128,7 @@ if (typeof AsyncDisposableStack !== "function") {
     }
 
     adopt<T>(value: T, dispose: (value: T) => Awaitable<void>): T {
+      // deno-lint-ignore require-await
       const disposable = { [Symbol.asyncDispose]: async () => dispose(value) }
 
       this.use(disposable)
@@ -131,6 +137,7 @@ if (typeof AsyncDisposableStack !== "function") {
     }
 
     defer(dispose: () => Awaitable<void>): void {
+      // deno-lint-ignore require-await
       const disposable = { [Symbol.asyncDispose]: async () => dispose() }
 
       this.use(disposable)

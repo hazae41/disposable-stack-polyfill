@@ -11,32 +11,24 @@
   "module": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
   "sideEffects": true,
-  "files": [
-    "./dist/esm",
-    "./dist/cjs",
-    "./dist/types"
-  ],
   "scripts": {
-    "build": "rimraf dist && rollup -c",
-    "test": "node ./dist/test/index.test.mjs"
+    "prepare": "rm -rf ./out && tsc && tscousin",
+    "version": "deno -RW ./vsync.ts && git add deno.json"
   },
-  "devDependencies": {
-    "@hazae41/phobos": "^1.0.10",
-    "@hazae41/rimraf": "^1.0.1",
-    "@rollup/plugin-typescript": "^12.1.4",
-    "@types/node": "^24.1.0",
-    "rollup": "^4.45.1",
-    "rollup-plugin-dts": "^6.2.1",
-    "rollup-plugin-node-externals": "^8.0.1",
-    "tslib": "^2.8.1",
-    "typescript": "^5.8.3"
-  },
+  "files": [
+    "./out"
+  ],
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/src/index.mjs",
-      "require": "./dist/cjs/src/index.cjs"
+      "types": "./out/mod.d.ts",
+      "import": "./out/mod.js"
     }
+  },
+  "devDependencies": {
+    "@hazae41/phobos": "^2.0.4",
+    "@hazae41/tscousin": "^1.0.11",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.2"
   },
   "keywords": [
     "polyfill",

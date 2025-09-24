@@ -1,0 +1,17 @@
+{
+  "name": "@hazae41/disposable-stack-polyfill",
+  "version": "1.0.4",
+  "imports": {
+    "@/": "./src/"
+  },
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-namespace"
+      ]
+    }
+  }
+}
