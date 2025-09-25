@@ -12,11 +12,6 @@ deno install jsr:@hazae41/disposable-stack-polyfill
 
 [**📦 NPM**](https://www.npmjs.com/package/@hazae41/disposable-stack-polyfill) • [**📦 JSR**](https://jsr.io/@hazae41/disposable-stack-polyfill)
 
-## Features
-- ESModules and CommonJS
-- No external dependency
-- Unit-tested
-
 ## Usage
 
 ### How?
