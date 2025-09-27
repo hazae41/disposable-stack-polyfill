@@ -12,6 +12,7 @@
   "types": "./dist/types/index.d.ts",
   "sideEffects": true,
   "scripts": {
+    "examine": "deno lint ./src && deno check ./src && deno test ./src",
     "prepare": "rm -rf ./out && tsc && tscousin",
     "version": "deno -RW ./vsync.ts && git add deno.json"
   },
@@ -28,8 +29,8 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@hazae41/phobos": "^2.0.4",
-    "@hazae41/tscousin": "^1.0.11",
+    "@hazae41/phobos": "^2.0.8",
+    "@hazae41/tscousin": "^1.0.18",
     "typescript": "^5.9.2"
   },
   "keywords": [
