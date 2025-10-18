@@ -3,7 +3,6 @@
   "name": "@hazae41/disposable-stack-polyfill",
   "version": "2.0.3",
   "description": "Polyfill for DisposableStack and AsyncDisposableStack",
-  "homepage": "https://github.com/hazae41/disposable-stack-polyfill",
   "repository": "github:hazae41/disposable-stack-polyfill",
   "author": "hazae41",
   "license": "MIT",
@@ -13,9 +12,9 @@
   "sideEffects": true,
   "scripts": {
     "examine": "deno lint ./src && deno check ./src && deno test ./src",
-    "prepare": "rm -rf ./out && tsc && tscousin",
-    "version": "deno -RW ./!vsync.ts && git add deno.json",
-    "synchro": "deno -RW ./!dsync.ts && deno install"
+    "version": "deno -RW ./x.vsync.ts && git add deno.json",
+    "prepare": "deno -RW ./x.dsync.ts && deno install",
+    "prepack": "rm -rf ./out && tsc && tscousin"
   },
   "files": [
     "./out"
@@ -30,9 +29,9 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@hazae41/phobos": "^2.0.8",
-    "@hazae41/tscousin": "^1.0.18",
-    "typescript": "^5.9.2"
+    "@hazae41/phobos": "^2.0.13",
+    "@hazae41/tscousin": "^1.0.28",
+    "typescript": "^5.9.3"
   },
   "keywords": [
     "polyfill",
