@@ -6,10 +6,6 @@
   "repository": "github:hazae41/disposable-stack-polyfill",
   "author": "hazae41",
   "license": "MIT",
-  "main": "./dist/cjs/index.cjs",
-  "module": "./dist/esm/index.mjs",
-  "types": "./dist/types/index.d.ts",
-  "sideEffects": true,
   "scripts": {
     "examine": "deno lint ./src && deno check ./src && deno test ./src",
     "version": "deno -RW ./x.vsync.ts && git add deno.json",
