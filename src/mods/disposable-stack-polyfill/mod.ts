@@ -1,10 +1,11 @@
+// deno-lint-ignore-file no-explicit-any
+
 import { __addDisposableResource, __disposeResources } from "tslib";
 import type { Awaitable } from "../../libs/awaitable/mod.ts";
 import type { Nullable } from "../../libs/nullable/mod.ts";
 
 interface State {
 
-  // deno-lint-ignore no-explicit-any
   stack: any[];
 
   error: unknown;
