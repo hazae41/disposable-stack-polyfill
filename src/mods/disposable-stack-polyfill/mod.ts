@@ -1,6 +1,6 @@
-import type { Awaitable } from "@/libs/awaitable/mod.ts";
-import type { Nullable } from "@/libs/nullable/mod.ts";
 import { __addDisposableResource, __disposeResources } from "tslib";
+import type { Awaitable } from "../../libs/awaitable/mod.ts";
+import type { Nullable } from "../../libs/nullable/mod.ts";
 
 interface State {
 
@@ -84,7 +84,7 @@ if (typeof DisposableStack !== "function") {
 
   }
 
-  Object.defineProperty(globalThis, "DisposableStack", { value: DisposableStack })
+  Object.defineProperty(globalThis, "DisposableStack", { value: DisposableStack, enumerable: true })
 }
 
 if (typeof AsyncDisposableStack !== "function") {
@@ -160,5 +160,5 @@ if (typeof AsyncDisposableStack !== "function") {
 
   }
 
-  Object.defineProperty(globalThis, "AsyncDisposableStack", { value: AsyncDisposableStack })
+  Object.defineProperty(globalThis, "AsyncDisposableStack", { value: AsyncDisposableStack, enumerable: true })
 }
